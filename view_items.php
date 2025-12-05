@@ -659,11 +659,14 @@ if ($result->num_rows > 0) {
                         </form>
                     <?php endif; ?>
                     
-                    <form method="post" onsubmit="return confirm('Delete this item and all claims?');" style="margin-top:12px;">
-                        <input type="hidden" name="item_id" value="<?= $id ?>">
-                        <input type="hidden" name="action" value="delete">
-                        <button class="btn btn-danger" type="submit">Delete Item</button>
-                    </form>
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                        <a href="update_item.php?item_id=<?= $id ?>" class="btn" style="background:#3498db;">✏️ Edit Item</a>
+                        <form method="post" onsubmit="return confirm('Delete this item and all claims?');" style="display:inline;">
+                            <input type="hidden" name="item_id" value="<?= $id ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <button class="btn btn-danger" type="submit">Delete Item</button>
+                        </form>
+                    </div>
                 <?php else: ?>
                     <?php if ($item_status === 'available'): ?>
                         <div class="claim-form" style="margin-top:20px;">
