@@ -286,7 +286,7 @@ class ItemMatcher {
             $sql = "SELECT 
                         im.match_id, im.confidence_score, im.match_reasoning, im.status,
                         i.item_id, i.title, i.description, i.photo,
-                        u.name as poster_name, u.email as poster_email,
+                        u.user_id as poster_id, u.name as poster_name, u.email as poster_email,
                         l.building, l.room
                     FROM ItemMatch im
                     INNER JOIN Item i ON im.found_item_id = i.item_id
@@ -301,7 +301,7 @@ class ItemMatcher {
             $sql = "SELECT 
                         im.match_id, im.confidence_score, im.match_reasoning, im.status,
                         i.item_id, i.title, i.description, i.photo,
-                        u.name as poster_name, u.email as poster_email,
+                        u.user_id as poster_id, u.name as poster_name, u.email as poster_email,
                         l.building, l.room
                     FROM ItemMatch im
                     INNER JOIN Item i ON im.lost_item_id = i.item_id

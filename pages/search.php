@@ -90,7 +90,7 @@ if ($result->num_rows > 0) {
                             <div class="item-card-image" style="background-image: url('<?= $photo ?: 'https://via.placeholder.com/300x200?text=No+Image' ?>')"></div>
                             <div class="item-card-content">
                                 <h3><?= $title ?></h3>
-                                <p class="item-card-poster">Posted by: <?= $poster ?></p>
+                                <p class="item-card-poster">Posted by: <a href="user_profile.php?user_id=<?= intval($item['poster_id']) ?>" style="color:#667eea;text-decoration:none;font-weight:600;" onclick="event.stopPropagation();" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><?= $poster ?></a></p>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -114,7 +114,7 @@ if ($result->num_rows > 0) {
                             <div class="item-card-image" style="background-image: url('<?= $photo ?: 'https://via.placeholder.com/300x200?text=No+Image' ?>')"></div>
                             <div class="item-card-content">
                                 <h3><?= $title ?></h3>
-                                <p class="item-card-poster">Reported by: <?= $poster ?></p>
+                                <p class="item-card-poster">Reported by: <a href="user_profile.php?user_id=<?= intval($item['poster_id']) ?>" style="color:#667eea;text-decoration:none;font-weight:600;" onclick="event.stopPropagation();" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><?= $poster ?></a></p>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -149,7 +149,7 @@ if ($result->num_rows > 0) {
                     <?php endif; ?>
                 </div>
                 <h2><?= $title ?></h2>
-                <p><strong>Posted by:</strong> <?= $poster ?></p>
+                <p><strong>Posted by:</strong> <a href="user_profile.php?user_id=<?= intval($item['poster_id']) ?>" style="color:#667eea;text-decoration:none;font-weight:600;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><?= $poster ?></a></p>
                 <p><strong>Description:</strong> <?= $desc ?></p>
                 <p><strong>Location:</strong> <?= $loc ?></p>
                 

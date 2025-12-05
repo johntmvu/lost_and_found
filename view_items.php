@@ -527,7 +527,7 @@ if ($result->num_rows > 0) {
                     <div style="font-size:24px;"><?= $poster_trust['icon'] ?></div>
                     <div style="flex:1;">
                         <div style="font-weight:600;">
-                            <a href="user_profile.php?user_id=<?= $poster_id ?>" style="color:#333;text-decoration:none;">
+                            <a href="pages/user_profile.php?user_id=<?= $poster_id ?>" style="color:#667eea;text-decoration:none;font-weight:600;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
                                 <?= $poster ?>
                             </a>
                             <?php if ($poster_verified): ?>
@@ -630,7 +630,7 @@ if ($result->num_rows > 0) {
                                     
                                     <p style="margin:8px 0;"><strong>Description:</strong> <?= htmlspecialchars(substr($match['description'], 0, 150)) ?><?= strlen($match['description']) > 150 ? '...' : '' ?></p>
                                     <p style="margin:8px 0;font-size:13px;color:#7f8c8d;"><strong>Why it matches:</strong> <?= htmlspecialchars($match['match_reasoning']) ?></p>
-                                    <p style="margin:8px 0;"><strong>Posted by:</strong> <?= htmlspecialchars($match['poster_name']) ?></p>
+                                    <p style="margin:8px 0;"><strong>Posted by:</strong> <a href="pages/user_profile.php?user_id=<?= intval($match['poster_id']) ?>" style="color:#667eea;text-decoration:none;font-weight:600;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><?= htmlspecialchars($match['poster_name']) ?></a></p>
                                     <?php if ($match['building'] || $match['room']): ?>
                                         <p style="margin:8px 0;"><strong>Location:</strong> <?= htmlspecialchars(trim($match['building'] . ' ' . $match['room'])) ?></p>
                                     <?php endif; ?>
