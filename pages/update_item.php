@@ -1,12 +1,12 @@
 <?php
 session_start();
-include 'db_connect.php';
-require_once 'reputation_system.php';
+include '../includes/db_connect.php';
+require_once '../includes/reputation_system.php';
 
 $session_user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
 if (!$session_user_id) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -19,13 +19,13 @@ $check->execute();
 $check_result = $check->get_result();
 
 if (!$check_result || $check_result->num_rows === 0) {
-    header('Location: view_items.php');
+    header('Location: ../view_items.php');
     exit;
 }
 
 $check_row = $check_result->fetch_assoc();
 if (intval($check_row['user_id']) !== $session_user_id) {
-    header('Location: view_items.php');
+    header('Location: ../view_items.php');
     exit;
 }
 
@@ -41,7 +41,7 @@ $item_result = $item_stmt->get_result();
 $item = $item_result->fetch_assoc();
 
 if (!$item) {
-    header('Location: view_items.php');
+    header('Location: ../view_items.php');
     exit;
 }
 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Handle new photo upload
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/';
+        $upload_dir = '../uploads/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
         }
@@ -73,10 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (move_uploaded_file($file_tmp, $upload_path)) {
                 // Delete old photo if it exists
-                if ($photo && file_exists($photo)) {
-                    unlink($photo);
+                if ($photo && file_exists('../' . $photo)) {
+                    unlink('../' . $photo);
                 }
-                $photo = $upload_path;
+                $photo = 'uploads/' . $new_filename; // Store relative path from root
             }
         }
     }
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Determine which tab to return to
         $tab_hash = $item_type === 'lost' ? '#lost-tab' : '#found-tab';
-        header("Location: view_items.php{$tab_hash}&modal={$item_id}");
+        header("Location: ../view_items.php{$tab_hash}&modal={$item_id}");
         exit;
     } catch (Exception $e) {
         $conn->rollback();
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Update Item</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container">
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div style="display:flex;gap:8px;">
                 <button class="btn" type="submit">Update Item</button>
-                <a class="btn btn-ghost" href="view_items.php">Cancel</a>
+                <a class="btn btn-ghost" href="../view_items.php">Cancel</a>
             </div>
         </form>
     </div>

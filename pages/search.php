@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connect.php';
+include '../includes/db_connect.php';
 
 $session_user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 $q = $_GET['q'] ?? '';
@@ -54,7 +54,7 @@ if ($result->num_rows > 0) {
     <title>Search Items</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container">
@@ -66,7 +66,7 @@ if ($result->num_rows > 0) {
             </div>
             <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
                 <button class="btn" type="submit">Search</button>
-                <a class="btn btn-ghost" href="view_items.php">Back</a>
+                <a class="btn btn-ghost" href="../view_items.php">Back</a>
             </div>
         </form>
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'db_connect.php';
-require_once 'reputation_system.php';
+require_once '../includes/db_connect.php';
+require_once '../includes/reputation_system.php';
 
 $reputation = new ReputationSystem($conn);
 
@@ -51,12 +51,12 @@ $recent_actions = $recent_actions_stmt->get_result();
     <title><?= htmlspecialchars($user['name']) ?> - Profile</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container">
         <div class="nav">
-            <a class="btn btn-ghost" href="view_items.php">← Back to Items</a>
+            <a class="btn btn-ghost" href="../view_items.php">← Back to Items</a>
             <?php if ($is_own_profile): ?>
                 <a class="btn btn-ghost" href="index.php?action=logout">Logout</a>
             <?php endif; ?>

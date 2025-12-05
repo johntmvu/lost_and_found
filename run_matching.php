@@ -5,8 +5,8 @@
  * Can be run manually or via cron job
  */
 
-require_once 'db_connect.php';
-require_once 'match_engine.php';
+require_once 'includes/db_connect.php';
+require_once 'includes/match_engine.php';
 
 // Check if running from command line
 $isCLI = php_sapi_name() === 'cli';

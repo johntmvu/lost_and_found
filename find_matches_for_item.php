@@ -5,8 +5,8 @@
  */
 
 session_start();
-require_once 'db_connect.php';
-require_once 'match_engine.php';
+require_once 'includes/db_connect.php';
+require_once 'includes/match_engine.php';
 
 $session_user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 $item_id = intval($_GET['item_id'] ?? 0);

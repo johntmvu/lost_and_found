@@ -1,6 +1,6 @@
 <?php
-include 'db_connect.php';
-require_once 'reputation_system.php';
+include '../includes/db_connect.php';
+require_once '../includes/reputation_system.php';
 session_start();
 
 // Determine session user (if logged in via demo login)
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Handle file upload
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/';
+        $upload_dir = '../uploads/';
         // Create uploads directory if it doesn't exist
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upload_path = $upload_dir . $new_filename;
             
             if (move_uploaded_file($file_tmp, $upload_path)) {
-                $photo = $upload_path;
+                $photo = 'uploads/' . $new_filename; // Store relative path from root
             }
         }
     }
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
-        header('Location: view_items.php');
+        header('Location: ../view_items.php');
         exit;
     } catch (Exception $e) {
         $conn->rollback();
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>Add Item</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="container">
@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <div>
                 <button class="btn" type="submit">Create Item</button>
-                <a class="btn btn-ghost" href="view_items.php">Back</a>
+                <a class="btn btn-ghost" href="../view_items.php">Back</a>
             </div>
         </form>
     </div>

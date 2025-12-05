@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connect.php';
+include 'includes/db_connect.php';
 
 // Determine session user (if logged in)
 $session_user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;

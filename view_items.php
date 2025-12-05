@@ -1,8 +1,8 @@
 <?php
 session_start();
-include 'db_connect.php';
-require_once 'match_engine.php';
-require_once 'reputation_system.php';
+include 'includes/db_connect.php';
+require_once 'includes/match_engine.php';
+require_once 'includes/reputation_system.php';
 
 $session_user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 $matcher = new ItemMatcher($conn);
@@ -339,9 +339,9 @@ if ($result->num_rows > 0) {
             <?php endif; ?>
         <?php endif; ?>
         <div class="nav">
-            <a class="btn" href="add_item.php">Add Item</a>
-            <a class="btn" href="search.php">Search</a>
-            <a class="btn" href="user_profile.php">My Profile</a>
+            <a class="btn" href="pages/add_item.php">Add Item</a>
+            <a class="btn" href="pages/search.php">Search</a>
+            <a class="btn" href="pages/user_profile.php">My Profile</a>
             <a class="btn btn-ghost" href="index.php?action=logout">Logout</a>
         </div>
 
@@ -660,7 +660,7 @@ if ($result->num_rows > 0) {
                     <?php endif; ?>
                     
                     <div style="display:flex;gap:8px;margin-top:12px;">
-                        <a href="update_item.php?item_id=<?= $id ?>" class="btn" style="background:#3498db;">✏️ Edit Item</a>
+                        <a href="pages/update_item.php?item_id=<?= $id ?>" class="btn" style="background:#3498db;">✏️ Edit Item</a>
                         <form method="post" onsubmit="return confirm('Delete this item and all claims?');" style="display:inline;">
                             <input type="hidden" name="item_id" value="<?= $id ?>">
                             <input type="hidden" name="action" value="delete">
