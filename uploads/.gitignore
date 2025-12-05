@@ -1,0 +1,8 @@
+# Ignore all uploaded files
+*
+
+# But keep this .gitignore file
+!.gitignore
+
+# Optional: Keep a README
+!README.md

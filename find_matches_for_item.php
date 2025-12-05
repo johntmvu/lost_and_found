@@ -120,6 +120,8 @@ while ($compare_item = $compare_result->fetch_assoc()) {
 
 $conn->close();
 
-// Redirect back with success message
-header("Location: view_items.php?matches_found={$matches_created}");
+// Redirect back with success message and modal anchor to reopen the modal
+// Preserve the correct tab based on item type
+$tab_hash = $item_type === 'lost' ? 'lost-tab' : 'found-tab';
+header("Location: view_items.php?matches_found={$matches_created}#{$tab_hash}&modal={$item_id}");
 exit;

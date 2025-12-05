@@ -216,8 +216,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_claim') {
     $item_id = intval($_POST['item_id'] ?? 0);
     $description = $_POST['claim_description'] ?? '';
-    $photo = $_POST['claim_photo'] ?? '';
+    $photo = '';
     $user_id = $session_user_id;
+    
+    // Handle file upload for claim photo
+    if (isset($_FILES['claim_photo']) && $_FILES['claim_photo']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        $file_tmp = $_FILES['claim_photo']['tmp_name'];
+        $file_name = $_FILES['claim_photo']['name'];
+        $file_size = $_FILES['claim_photo']['size'];
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (in_array($file_ext, $allowed_extensions) && $file_size <= 5000000) {
+            $new_filename = uniqid('claim_', true) . '.' . $file_ext;
+            $upload_path = $upload_dir . $new_filename;
+            
+            if (move_uploaded_file($file_tmp, $upload_path)) {
+                $photo = $upload_path;
+            }
+        }
+    }
 
     if ($user_id && $item_id) {
         $conn->begin_transaction();
@@ -454,6 +477,7 @@ if ($result->num_rows > 0) {
         $poster_rep_score = intval($item['reputation_score'] ?? 0);
         $poster_verified = boolval($item['verified'] ?? false);
         $poster_trust = $reputation->getTrustLevel($poster_rep_score);
+        $item_type = $item['item_type'] ?? 'found';
         
         // Get claims for this item if owner
         $claims = [];
@@ -484,7 +508,14 @@ if ($result->num_rows > 0) {
                         <div class="modal-placeholder">📦</div>
                     <?php endif; ?>
                 </div>
-                <h2><?= $title ?></h2>
+                <h2>
+                    <?= $title ?>
+                    <?php if ($item_type === 'found'): ?>
+                        <span style="background:#27ae60;color:#fff;padding:4px 12px;border-radius:20px;font-size:14px;margin-left:8px;font-weight:600;">✓ FOUND</span>
+                    <?php else: ?>
+                        <span style="background:#e74c3c;color:#fff;padding:4px 12px;border-radius:20px;font-size:14px;margin-left:8px;font-weight:600;">🔍 LOST</span>
+                    <?php endif; ?>
+                </h2>
                 <?php if ($item_status === 'returned'): ?>
                     <div class="status-banner status-returned">✓ This item has been returned</div>
                 <?php elseif ($item_status === 'claimed'): ?>
@@ -605,17 +636,7 @@ if ($result->num_rows > 0) {
                                     <?php endif; ?>
                                     
                                     <div style="display:flex;gap:8px;margin-top:12px;">
-                                        <form method="post" style="display:inline;">
-                                            <input type="hidden" name="match_id" value="<?= $match_id ?>">
-                                            <input type="hidden" name="action" value="confirm_match">
-                                            <button class="btn btn-approve" type="submit" style="font-size:14px;padding:8px 16px;">✓ This is a Match!</button>
-                                        </form>
-                                        <form method="post" style="display:inline;">
-                                            <input type="hidden" name="match_id" value="<?= $match_id ?>">
-                                            <input type="hidden" name="action" value="dismiss_match">
-                                            <button class="btn btn-reject" type="submit" style="font-size:14px;padding:8px 16px;">✗ Not a Match</button>
-                                        </form>
-                                        <a href="mailto:<?= htmlspecialchars($match['poster_email']) ?>" class="btn" style="background:#3498db;font-size:14px;padding:8px 16px;">📧 Contact</a>
+                                        <button class="btn" onclick="closeModal(<?= $id ?>); setTimeout(function(){ openModal(<?= $match['item_id'] ?>); }, 100);" style="background:#3498db;font-size:14px;padding:8px 16px;">👁️ View This Item</button>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -646,23 +667,44 @@ if ($result->num_rows > 0) {
                 <?php else: ?>
                     <?php if ($item_status === 'available'): ?>
                         <div class="claim-form" style="margin-top:20px;">
-                            <h3>Submit a Claim</h3>
-                            <form method="post">
-                                <input type="hidden" name="item_id" value="<?= $id ?>">
-                                <input type="hidden" name="action" value="submit_claim">
-                                <div class="form-field">
-                                    <label for="claim_description_<?= $id ?>">Why is this yours?</label>
-                                    <textarea id="claim_description_<?= $id ?>" name="claim_description" required placeholder="Describe specific details only the owner would know..."></textarea>
-                                </div>
-                                <div class="form-field">
-                                    <label for="claim_photo_<?= $id ?>">Photo URL (optional)</label>
-                                    <input id="claim_photo_<?= $id ?>" type="text" name="claim_photo" placeholder="https://example.com/proof.jpg">
-                                </div>
-                                <button class="btn" type="submit">Submit Claim</button>
-                            </form>
+                            <?php if ($item_type === 'found'): ?>
+                                <h3>Claim This Item</h3>
+                                <p style="color:#666;font-size:14px;margin-bottom:12px;">If this is your item, submit a claim with details only you would know.</p>
+                                <form method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="item_id" value="<?= $id ?>">
+                                    <input type="hidden" name="action" value="submit_claim">
+                                    <div class="form-field">
+                                        <label for="claim_description_<?= $id ?>">Why is this yours?</label>
+                                        <textarea id="claim_description_<?= $id ?>" name="claim_description" required placeholder="Describe specific details only the owner would know..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="claim_photo_<?= $id ?>">Photo Proof (optional)</label>
+                                        <input id="claim_photo_<?= $id ?>" type="file" name="claim_photo" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                                        <small style="color:#666;font-size:12px;margin-top:4px;display:block;">Upload a photo to help verify your claim (Max 5MB)</small>
+                                    </div>
+                                    <button class="btn" type="submit">Submit Claim</button>
+                                </form>
+                            <?php else: ?>
+                                <h3>Have You Seen This Item?</h3>
+                                <p style="color:#666;font-size:14px;margin-bottom:12px;">If you have found this item or have information about it, let the owner know.</p>
+                                <form method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="item_id" value="<?= $id ?>">
+                                    <input type="hidden" name="action" value="submit_claim">
+                                    <div class="form-field">
+                                        <label for="claim_description_<?= $id ?>">Do you have this item or information about it?</label>
+                                        <textarea id="claim_description_<?= $id ?>" name="claim_description" required placeholder="Describe where you found it, when you saw it, or any other helpful details..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="claim_photo_<?= $id ?>">Photo (optional)</label>
+                                        <input id="claim_photo_<?= $id ?>" type="file" name="claim_photo" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                                        <small style="color:#666;font-size:12px;margin-top:4px;display:block;">Upload a photo if you have the item (Max 5MB)</small>
+                                    </div>
+                                    <button class="btn" type="submit" style="background:#e74c3c;">Send Information</button>
+                                </form>
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
-                        <p style="margin-top:20px;color:#999;">This item is no longer available for claims.</p>
+                        <p style="margin-top:20px;color:#999;">This item is no longer available for responses.</p>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
@@ -700,13 +742,44 @@ if ($result->num_rows > 0) {
             event.target.classList.add('active');
         }
         
-        // Check URL hash on page load to preserve tab state
+        // Check URL hash on page load to preserve tab state or open modal
         window.addEventListener('DOMContentLoaded', function() {
             const hash = window.location.hash;
-            if (hash === '#lost-tab') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modalParam = urlParams.get('modal');
+            
+            // Check if hash is a modal ID (format: #modal-123)
+            if (hash.startsWith('#modal-')) {
+                const modalId = hash.substring(1); // Remove the # symbol
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            } else if (hash === '#lost-tab') {
                 switchTabByName('lost');
+                // Check if we need to open a modal after switching tabs
+                if (modalParam) {
+                    setTimeout(function() {
+                        const modal = document.getElementById('modal-' + modalParam);
+                        if (modal) {
+                            modal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }, 100);
+                }
             } else if (hash === '#found-tab') {
                 switchTabByName('found');
+                // Check if we need to open a modal after switching tabs
+                if (modalParam) {
+                    setTimeout(function() {
+                        const modal = document.getElementById('modal-' + modalParam);
+                        if (modal) {
+                            modal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }, 100);
+                }
             }
         });
         

@@ -21,6 +21,9 @@ a { color: #0066cc; }
 .form-field { display:flex; flex-direction:column; gap:6px }
 label { font-weight:600 }
 input[type="text"], input[type="email"], input[type="search"], select, textarea { padding:8px; border:1px solid #ccc; border-radius:4px; font-size:14px; font-family: Arial, Helvetica, sans-serif }
+input[type="file"] { padding:8px; border:1px solid #ccc; border-radius:4px; font-size:14px; font-family: Arial, Helvetica, sans-serif; cursor:pointer }
+input[type="file"]::-webkit-file-upload-button { padding:6px 12px; background:#f5f5f5; border:1px solid #ddd; border-radius:4px; cursor:pointer; margin-right:8px }
+input[type="file"]::-webkit-file-upload-button:hover { background:#e9ecef }
 textarea { min-height:100px }
 .error { color:#c0392b; }
 

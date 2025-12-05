@@ -15,12 +15,38 @@ if (!$session_user_id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
-    $photo = $_POST['photo'] ?? '';
+    $photo = '';
     $item_type = $_POST['item_type'] ?? 'found'; // 'found' or 'lost'
     // prefer logged-in session user, otherwise use posted user_id
     $user_id = $session_user_id ?: intval($_POST['user_id'] ?? 0);
     $location_text = trim($_POST['location_text'] ?? '');
     $location_id = 0;
+    
+    // Handle file upload
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/';
+        // Create uploads directory if it doesn't exist
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        $file_tmp = $_FILES['photo']['tmp_name'];
+        $file_name = $_FILES['photo']['name'];
+        $file_size = $_FILES['photo']['size'];
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        
+        // Validate file type
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (in_array($file_ext, $allowed_extensions) && $file_size <= 5000000) { // 5MB max
+            // Generate unique filename
+            $new_filename = uniqid('item_', true) . '.' . $file_ext;
+            $upload_path = $upload_dir . $new_filename;
+            
+            if (move_uploaded_file($file_tmp, $upload_path)) {
+                $photo = $upload_path;
+            }
+        }
+    }
 
     if ($location_text !== '') {
         // Try to find an existing location with the same building text
@@ -88,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <h1>Add Item</h1>
         <?php if (!empty($error)) echo '<p class="error">Error: '.htmlspecialchars($error).'</p>'; ?>
-        <form method="post" class="form">
+        <form method="post" class="form" enctype="multipart/form-data">
             <div class="form-field">
                 <label for="title">Title</label>
                 <input id="title" type="text" name="title" required>
@@ -98,8 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <textarea id="description" name="description"></textarea>
             </div>
             <div class="form-field">
-                <label for="photo">Photo URL</label>
-                <input id="photo" type="text" name="photo" placeholder="https://example.com/image.jpg">
+                <label for="photo">Photo (JPG, PNG, GIF, WEBP - Max 5MB)</label>
+                <input id="photo" type="file" name="photo" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                <small style="color:#666;font-size:12px;margin-top:4px;display:block;">Optional: Upload a photo to help identify the item</small>
             </div>
             <div class="form-field">
                 <label>Item Type</label>
